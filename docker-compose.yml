@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  mail_tracker:
+    build: .
+    ports:
+      - "15100:5000"
+    restart: always
+    volumes:
+      - ./:/app
+    command: ["python", "main.py"]
+

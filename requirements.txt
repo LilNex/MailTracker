@@ -1,0 +1,5 @@
+requests
+flask
+WTForms==2.2.1
+flask_mail
+python-dotenv

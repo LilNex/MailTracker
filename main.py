@@ -20,7 +20,7 @@ app.config.update(
 	DEBUG=True,
 	#EMAIL SETTINGS
 	MAIL_SERVER=os.getenv("MAIL_SERVER"),
-	MAIL_PORT=os.getenv("MAIL_PORT"),
+	MAIL_PORT=465,
 	MAIL_USE_SSL=True,
 	MAIL_USERNAME = os.getenv("MAIL_USERNAME"),
 	MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
@@ -30,7 +30,7 @@ mail = Mail(app)
 ii = db.csv_to_python_object()
 
 def get_my_ip():
-    return request.remote_addr
+    return os.getenv("HOST_URL")
 
 def maill(sender, receiver, ip):
     try:
@@ -51,8 +51,6 @@ def render_image():
     if mailID in ii:
         ip = get_my_ip()
         app.logger.warning(ip)
-##        t=threading.Thread(target=maill, args=(ii[mailID][0], 'a',))
-##        t.start()
         maill(ii[mailID][0], ii[mailID][1], ip)
     return send_file('pi.png', mimetype='image/gif')
 
@@ -95,7 +93,7 @@ class ReusableForm(Form):
                 
                 flash(f'Paste this HTML code in the email: ')
 
-                url = request.url_root
+                url = get_my_ip()
                 html_code = f'<img src={url}image?type={mail_id}></img>'
                 flash(f'{html_code}')
                 db.write_data(sender, receiver, mail_id)
@@ -118,7 +116,7 @@ class ReusableForm(Form):
 
 if __name__ == "__main__":
     try:
-        port = int(os.environ.get('PORT', 5000))
-        app.run(host='localhost', port=port)
+        port = int(os.environ.get('PORT', 15100))
+        app.run(host='0.0.0.0', port=port)
     except:
         logging.exception('error')

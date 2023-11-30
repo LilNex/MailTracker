@@ -4,9 +4,9 @@ services:
   mail_tracker:
     build: .
     ports:
-      - "15100:5000"
+      - "15100:15100"
     restart: always
     volumes:
       - ./:/app
-    command: ["python", "main.py"]
+    command: ["python3", "main.py"]
 

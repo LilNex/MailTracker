@@ -19,4 +19,4 @@ ENV ENV_FILE=${ENV_FILE:-.env}
 COPY $ENV_FILE /app/.env
 
 # Command to run your application
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]

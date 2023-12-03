@@ -2,6 +2,7 @@ from flask import Flask, render_template, flash, request, send_file
 from wtforms import Form, TextField, TextAreaField, RadioField, validators, StringField, SubmitField
 import logging
 import time
+from werkzeug.middleware.proxy_fix import ProxyFix
 # import image
 import db
 import os
@@ -15,7 +16,9 @@ load_dotenv()
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 app.config.update(
 	DEBUG=True,
 	#EMAIL SETTINGS
@@ -28,9 +31,10 @@ app.config.update(
 mail = Mail(app)
 
 ii = db.csv_to_python_object()
-
 def get_my_ip():
-    return os.getenv("HOST_URL")
+    request.environ.get('HTTP_X_REAL_IP', request.remote_addr)   
+    return request.remote_addr
+
 
 def maill(sender, receiver, ip):
     try:
@@ -93,7 +97,7 @@ class ReusableForm(Form):
                 
                 flash(f'Paste this HTML code in the email: ')
 
-                url = get_my_ip()
+                url = os.getenv("HOST_URL")
                 html_code = f'<img src={url}image?type={mail_id}></img>'
                 flash(f'{html_code}')
                 db.write_data(sender, receiver, mail_id)
@@ -107,7 +111,7 @@ class ReusableForm(Form):
                     for l in ers[key]:
                         msg+=l
                         msg+='. '
-                print(msg)
+                # print(msg)
 
                 flash(f'Error: {msg}')
 
